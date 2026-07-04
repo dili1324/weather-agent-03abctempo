@@ -1,0 +1,70 @@
+name: Weather Agent mppx Experiment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-mppx-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WEATHER_CITY_QUERY: Hanoi,VN
+      WEATHER_UNITS: metric
+      WEATHER_LANG: vi
+      WEATHER_PAYMENT_MODE: mppx
+      ENABLE_GPT_SUMMARY: "false"
+      MPPX_COMMAND_TIMEOUT_SECONDS: "120"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: node_mppx/package-lock.json
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-lock.txt
+          python -m pip install --no-build-isolation -e .
+
+      - name: Install Node dependencies
+        working-directory: node_mppx
+        run: npm ci
+
+      - name: Restore Tempo accounts CLI store
+        env:
+          TEMPO_ACCOUNTS_CLI_STORE_B64_PART1: ${{ secrets.TEMPO_ACCOUNTS_CLI_STORE_B64_PART1 }}
+          TEMPO_ACCOUNTS_CLI_STORE_B64_PART2: ${{ secrets.TEMPO_ACCOUNTS_CLI_STORE_B64_PART2 }}
+        run: |
+          test -n "$TEMPO_ACCOUNTS_CLI_STORE_B64_PART1"
+          test -n "$TEMPO_ACCOUNTS_CLI_STORE_B64_PART2"
+          mkdir -p "$HOME/.tempo/wallet"
+          chmod 700 "$HOME/.tempo"
+          chmod 700 "$HOME/.tempo/wallet"
+          printf '%s%s' "$TEMPO_ACCOUNTS_CLI_STORE_B64_PART1" "$TEMPO_ACCOUNTS_CLI_STORE_B64_PART2" | base64 --decode > "$HOME/.tempo/wallet/store.json"
+          chmod 600 "$HOME/.tempo/wallet/store.json"
+          ls -l "$HOME/.tempo/wallet/store.json"
+          wc -c "$HOME/.tempo/wallet/store.json"
+
+      - name: Typecheck mppx helper
+        working-directory: node_mppx
+        run: npm run typecheck
+
+      - name: Run mppx paid weather canary
+        working-directory: node_mppx
+        run: npm run weather:twice
+
+      - name: Run Weather Agent via mppx
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m weather_agent
