@@ -1,0 +1,26 @@
+{
+  "name": "weather-agent-mppx-spike",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local TypeScript mppx spike for Weather Agent paid OpenWeather MPP requests.",
+  "scripts": {
+    "connect": "tsx src/connect.ts",
+    "weather": "tsx src/weather.ts once",
+    "weather:once": "tsx src/weather.ts once",
+    "weather:twice": "tsx src/weather.ts twice",
+    "geocode": "tsx src/weather.ts geocode",
+    "current-weather": "tsx src/weather.ts current-weather",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "accounts": "0.14.11",
+    "mppx": "0.8.5",
+    "viem": "2.54.2"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.0",
+    "tsx": "4.23.0",
+    "typescript": "6.0.3"
+  }
+}

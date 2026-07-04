@@ -1,0 +1,45 @@
+name: Weather Agent
+
+on:
+  schedule:
+    # GitHub cron is UTC. 00:00 UTC is 07:00 in Asia/Ho_Chi_Minh.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  run-weather-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-lock.txt
+          python -m pip install --no-build-isolation -e .
+
+      - name: Install Tempo CLI
+        run: |
+          curl -fsSL https://tempo.xyz/install | bash
+          echo "$HOME/.tempo/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run Weather Agent
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TEMPO_BIN: tempo
+          MPP_MAX_SPEND_USD: ${{ vars.MPP_MAX_SPEND_USD || '0.05' }}
+          WEATHER_CITY_QUERY: Hanoi,VN
+          WEATHER_UNITS: metric
+          WEATHER_LANG: vi
+          ENABLE_GPT_SUMMARY: ${{ vars.ENABLE_GPT_SUMMARY || 'false' }}
+          GPT_MODEL: ${{ vars.GPT_MODEL || 'gpt-4o' }}
+        run: python -m weather_agent
