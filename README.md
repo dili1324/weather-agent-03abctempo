@@ -1,6 +1,6 @@
-# weather-agent-tempoisno010x2
+# weather-agent-03abctempo
 
-weather-agent-tempoisno010x2 is a small Python 3.12 application that sends the current weather in Hanoi to Telegram. The current priority is an MVP proof of concept: run locally on macOS, pay through a secondary/test Tempo Wallet, and confirm Telegram receives the weather report.
+weather-agent-03abctempo is a small Python 3.12 application that sends the current weather in Hanoi to Telegram. The current priority is an MVP proof of concept: run locally on macOS, pay through a secondary/test Tempo Wallet, and confirm Telegram receives the weather report.
 
 The original production path is:
 
@@ -65,7 +65,7 @@ scripts/make_clean_zip.sh
 Or run the equivalent command manually:
 
 ```bash
-zip -r weather-agent-tempoisno010x2-clean.zip . -x ".git/*" ".venv/*" "node_modules/*" "node_mppx/node_modules/*" "__MACOSX/*" "*/__MACOSX/*" "*.egg-info/*" "*/*.egg-info/*" "*.DS_Store" ".env"
+zip -r weather-agent-03abctempo-clean.zip . -x ".git/*" ".venv/*" "node_modules/*" "node_mppx/node_modules/*" "__MACOSX/*" "*/__MACOSX/*" "*.egg-info/*" "*/*.egg-info/*" "*.DS_Store" ".env"
 ```
 
 ## Configuration
