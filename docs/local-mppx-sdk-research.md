@@ -261,7 +261,7 @@ npm run typecheck
 Verified local result:
 
 - `npm run typecheck` passes.
-- `npm run connect` authorized an Access Key for wallet `0x8EF9ba17DfF6362F8832543Cb715720A5a943848`.
+- `npm run connect` authorized an Access Key for the private test wallet configured outside the repository.
 - `npm run weather:once` completed `/geocode` and `/current-weather` through `mppx`.
 - `npm run weather:twice` completed two full OpenWeather flows in one process.
 - All four paid requests in `weather:twice` received payment challenges, created credentials, retried, and returned HTTP 200.
